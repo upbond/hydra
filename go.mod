@@ -66,8 +66,7 @@ require (
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1
 	gopkg.in/square/go-jose.v2 v2.5.1
+	rsc.io/quote/v3 v3.1.0 // indirect
 )
 
 replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.3.2-0.20201029132236-f36afb546df1
-
-replace github.com/ory/fosite => github.com/TinkoffCreditSystems/fosite v0.36.1-0.20201216164135-6cf3d51701e5
