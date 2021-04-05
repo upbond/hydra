@@ -91,7 +91,7 @@ func (j *JanitorConsentTestHelper) AccessTokenNotAfterValidate(ctx context.Conte
 		var err error
 		ds := new(oauth2.Session)
 
-		accessTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.AccessTokenLifespan())
+		accessTokenLifespan := time.Now().UTC().Round(time.Second).Add(-j.conf.AccessTokenLifespan())
 
 		for _, r := range j.flushAccessRequests {
 			t.Logf("access flush check: %s", r.ID)
@@ -120,7 +120,7 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterValidate(ctx context.Cont
 		var err error
 		ds := new(oauth2.Session)
 
-		refreshTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.RefreshTokenLifespan())
+		refreshTokenLifespan := time.Now().UTC().Round(time.Second).Add(-j.conf.RefreshTokenLifespan())
 
 		for _, r := range j.flushRefreshRequests {
 			t.Logf("refresh flush check: %s", r.ID)
@@ -404,8 +404,8 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 			for k, v := range notAfterTests {
 				jt := NewConsentJanitorTestHelper(k)
 				t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-					notAfter := time.Now().Round(time.Second).Add(-v)
-					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
+					notAfter := time.Now().UTC().Round(time.Second).Add(-v)
+					consentRequestLifespan := time.Now().UTC().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
 
 					// setup test
 					t.Run("step=setup", jt.LoginConsentNotAfterSetup(ctx, consentManager, clientManager))
@@ -431,7 +431,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().UTC().Round(time.Second)))
 				})
 
 				// validate
@@ -446,7 +446,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().UTC().Round(time.Second)))
 				})
 
 				// validate
@@ -465,7 +465,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().UTC().Round(time.Second)))
 				})
 
 				// validate
@@ -482,7 +482,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().UTC().Round(time.Second)))
 				})
 
 				// validate
@@ -497,7 +497,7 @@ func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Requ
 	return []*fosite.Request{
 		{
 			ID:             fmt.Sprintf("%s_flush-access-1", uniqueName),
-			RequestedAt:    time.Now().Round(time.Second),
+			RequestedAt:    time.Now().UTC().Round(time.Second),
 			Client:         &client.Client{OutfacingID: fmt.Sprintf("%s_flush-access-1", uniqueName)},
 			RequestedScope: fosite.Arguments{"fa", "ba"},
 			GrantedScope:   fosite.Arguments{"fa", "ba"},
@@ -506,7 +506,7 @@ func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Requ
 		},
 		{
 			ID:             fmt.Sprintf("%s_flush-access-2", uniqueName),
-			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+			RequestedAt:    time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Minute)),
 			Client:         &client.Client{OutfacingID: fmt.Sprintf("%s_flush-access-2", uniqueName)},
 			RequestedScope: fosite.Arguments{"fa", "ba"},
 			GrantedScope:   fosite.Arguments{"fa", "ba"},
@@ -515,7 +515,7 @@ func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Requ
 		},
 		{
 			ID:             fmt.Sprintf("%s_flush-access-3", uniqueName),
-			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+			RequestedAt:    time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Hour)),
 			Client:         &client.Client{OutfacingID: fmt.Sprintf("%s_flush-access-3", uniqueName)},
 			RequestedScope: fosite.Arguments{"fa", "ba"},
 			GrantedScope:   fosite.Arguments{"fa", "ba"},
@@ -533,7 +533,7 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 				"refresh_token",
 			},
 			Request: fosite.Request{
-				RequestedAt:    time.Now().Round(time.Second),
+				RequestedAt:    time.Now().UTC().Round(time.Second),
 				ID:             fmt.Sprintf("%s_flush-refresh-1", uniqueName),
 				Client:         &client.Client{OutfacingID: fmt.Sprintf("%s_flush-refresh-1", uniqueName)},
 				RequestedScope: []string{"offline"},
@@ -549,7 +549,7 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 				"refresh_token",
 			},
 			Request: fosite.Request{
-				RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+				RequestedAt:    time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Minute)),
 				ID:             fmt.Sprintf("%s_flush-refresh-2", uniqueName),
 				Client:         &client.Client{OutfacingID: fmt.Sprintf("%s_flush-refresh-2", uniqueName)},
 				RequestedScope: []string{"offline"},
@@ -565,7 +565,7 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 				"refresh_token",
 			},
 			Request: fosite.Request{
-				RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+				RequestedAt:    time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Hour)),
 				ID:             fmt.Sprintf("%s_flush-refresh-3", uniqueName),
 				Client:         &client.Client{OutfacingID: fmt.Sprintf("%s_flush-refresh-3", uniqueName)},
 				RequestedScope: []string{"offline"},
@@ -590,8 +590,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*consent.Logi
 				RedirectURIs: []string{"http://redirect"},
 			},
 			RequestURL:      "http://redirect",
-			RequestedAt:     time.Now().Round(time.Second),
-			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second)),
+			RequestedAt:     time.Now().UTC().Round(time.Second),
+			AuthenticatedAt: sqlxx.NullTime(time.Now().UTC().Round(time.Second)),
 			Verifier:        fmt.Sprintf("%s_flush-login-1", uniqueName),
 		},
 		{
@@ -603,8 +603,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*consent.Logi
 				RedirectURIs: []string{"http://redirect"},
 			},
 			RequestURL:      "http://redirect",
-			RequestedAt:     time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-(lifespan + time.Minute))),
+			RequestedAt:     time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Minute)),
+			AuthenticatedAt: sqlxx.NullTime(time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Minute))),
 			Verifier:        fmt.Sprintf("%s_flush-login-2", uniqueName),
 		},
 		{
@@ -616,8 +616,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*consent.Logi
 				RedirectURIs: []string{"http://redirect"},
 			},
 			RequestURL:      "http://redirect",
-			RequestedAt:     time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-(lifespan + time.Hour))),
+			RequestedAt:     time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Hour)),
+			AuthenticatedAt: sqlxx.NullTime(time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Hour))),
 			Verifier:        fmt.Sprintf("%s_flush-login-3", uniqueName),
 		},
 	}
@@ -633,7 +633,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			ClientID:             fmt.Sprintf("%s_flush-login-consent-1", uniqueName),
 			RequestURL:           "http://redirect",
 			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-1", uniqueName)),
-			RequestedAt:          time.Now().Round(time.Second),
+			RequestedAt:          time.Now().UTC().Round(time.Second),
 			Verifier:             fmt.Sprintf("%s_flush-consent-1", uniqueName),
 		},
 		{
@@ -644,7 +644,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			ClientID:             fmt.Sprintf("%s_flush-login-consent-2", uniqueName),
 			RequestURL:           "http://redirect",
 			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-2", uniqueName)),
-			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+			RequestedAt:          time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Minute)),
 			Verifier:             fmt.Sprintf("%s_flush-consent-2", uniqueName),
 		},
 		{
@@ -655,7 +655,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			ClientID:             fmt.Sprintf("%s_flush-login-consent-3", uniqueName),
 			RequestURL:           "http://redirect",
 			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-3", uniqueName)),
-			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+			RequestedAt:          time.Now().UTC().Round(time.Second).Add(-(lifespan + time.Hour)),
 			Verifier:             fmt.Sprintf("%s_flush-consent-3", uniqueName),
 		},
 	}

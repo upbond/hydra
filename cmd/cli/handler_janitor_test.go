@@ -6,6 +6,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/kratos/x"
+	"github.com/ory/x/logrusx"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/hydra/grant/jwtbearer"
+
 	"github.com/ory/hydra/cmd"
 
 	"github.com/spf13/cobra"
@@ -44,7 +54,7 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan().String()),
 					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan().String()),
-					fmt.Sprintf("--%s", cli.OnlyTokens),
+					fmt.Sprintf("--%s", cli.Tokens),
 					jt.GetDSN(),
 				)
 			})
@@ -59,7 +69,6 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 
 func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 	ctx := context.Background()
-
 	testCycles := testhelpers.NewConsentJanitorTestHelper("").GetNotAfterTestCycles()
 
 	for k, v := range testCycles {
@@ -70,23 +79,62 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 			// Setup the test
 			t.Run("step=setup", jt.LoginConsentNotAfterSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+
 			// Run the cleanup routine
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan().String()),
-					fmt.Sprintf("--%s", cli.OnlyRequests),
+					fmt.Sprintf("--%s", cli.Requests),
 					jt.GetDSN(),
 				)
 			})
 
-			notAfter := time.Now().Round(time.Second).Add(-v)
-			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
+			notAfter := time.Now().UTC().Round(time.Second).Add(-v)
+			consentLifespan := time.Now().UTC().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
 			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg.ConsentManager()))
 		})
 	}
+}
 
+func TestJanitorHandler_PurgeJWTBearer(t *testing.T) {
+	ctx := context.Background()
+	reg := internal.NewMockedRegistry(t)
+
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", x.NewUUID()))
+	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
+	require.NoError(t, err)
+
+	var grant1, grant2, grant3 jwtbearer.Grant
+	t.Run("step=setup", func(t *testing.T) {
+		grant1, grant2, grant3 = jwtbearer.TestCreateStubGrants(t, reg.Persister())
+	})
+
+	// cleanup
+	t.Run("step=cleanup", func(t *testing.T) {
+		cmdx.ExecNoErr(t, newJanitorCmd(),
+			"janitor",
+			fmt.Sprintf("--%s", cli.GrantTypeJWTBearer),
+			conf.DSN(),
+		)
+	})
+
+	t.Run("step=validate", func(t *testing.T) {
+		count, err := reg.Persister().CountGrants(context.TODO())
+		require.NoError(t, err)
+		assert.Equal(t, 1, count)
+
+		_, err = reg.Persister().GetConcreteGrant(context.TODO(), grant1.ID)
+		assert.NoError(t, err)
+
+		_, err = reg.Persister().GetConcreteGrant(context.TODO(), grant2.ID)
+		assert.Error(t, err)
+
+		_, err = reg.Persister().GetConcreteGrant(context.TODO(), grant3.ID)
+		assert.Error(t, err)
+	})
 }
 
 func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
@@ -110,7 +158,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
-					fmt.Sprintf("--%s", cli.OnlyRequests),
+					fmt.Sprintf("--%s", cli.Requests),
 					jt.GetDSN(),
 				)
 			})
@@ -132,7 +180,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
-					fmt.Sprintf("--%s", cli.OnlyRequests),
+					fmt.Sprintf("--%s", cli.Requests),
 					jt.GetDSN(),
 				)
 			})
@@ -158,7 +206,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
-					fmt.Sprintf("--%s", cli.OnlyRequests),
+					fmt.Sprintf("--%s", cli.Requests),
 					jt.GetDSN(),
 				)
 			})
@@ -179,7 +227,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
-					fmt.Sprintf("--%s", cli.OnlyRequests),
+					fmt.Sprintf("--%s", cli.Requests),
 					jt.GetDSN(),
 				)
 			})
@@ -187,20 +235,23 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			// validate
 			t.Run("step=validate", jt.ConsentRejectionValidate(ctx, reg.ConsentManager()))
 		})
-
 	})
-
 }
 
 func TestJanitorHandler_Arguments(t *testing.T) {
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
 		"janitor",
-		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s", cli.Requests),
 		"memory",
 	)
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
 		"janitor",
-		fmt.Sprintf("--%s", cli.OnlyTokens),
+		fmt.Sprintf("--%s", cli.Tokens),
+		"memory",
+	)
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.GrantTypeJWTBearer),
 		"memory",
 	)
 
@@ -208,5 +259,5 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"janitor",
 		"memory")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Janitor requires either --tokens or --requests or both to be set")
+	require.Contains(t, err.Error(), "Janitor requires at least --tokens or --requests or --grant-type-jwt-bearer to be set")
 }

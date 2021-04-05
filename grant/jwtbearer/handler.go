@@ -34,10 +34,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.POST(grantJWTBearerPath, h.Create)
 
 	admin.DELETE(grantJWTBearerPath+"/:id", h.Delete)
-	admin.POST(grantJWTBearerPath+"/flush", h.FlushHandler)
 }
 
-// swagger:route POST /grants/jwt-bearer admin createJWTBearerGrant
+// swagger:route POST /grants/jwt-bearer admin createGrantTypeJwtBearer
 //
 // Create a new jwt-bearer Grant.
 //
@@ -53,7 +52,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //     Schemes: http, https
 //
 //     Responses:
-//       201: JWTBearerGrant
+//       201: grantTypeJwtBearer
 //       400: genericError
 //       409: genericError
 //       500: genericError
@@ -91,7 +90,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID, &grant)
 }
 
-// swagger:route GET /grants/jwt-bearer/{id} admin getJWTBearerGrant
+// swagger:route GET /grants/jwt-bearer/{id} admin getGrantTypeJwtBearer
 //
 // Fetch jwt-bearer grant information.
 //
@@ -107,7 +106,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JWTBearerGrant
+//       200: grantTypeJwtBearer
 //       404: genericError
 //       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -122,7 +121,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.registry.Writer().Write(w, r, grant)
 }
 
-// swagger:route DELETE /grants/jwt-bearer/{id} admin deleteJWTBearerGrant
+// swagger:route DELETE /grants/jwt-bearer/{id} admin deleteGrantTypeJwtBearer
 //
 // Delete jwt-bearer grant.
 //
@@ -153,7 +152,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /grants/jwt-bearer admin getJWTBearerGrantList
+// swagger:route GET /grants/jwt-bearer admin getGrantTypeJwtBearerList
 //
 // Fetch all jwt-bearer grants.
 //
@@ -169,7 +168,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JWTBearerGrantList
+//       200: grantTypeJwtBearerList
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
@@ -194,39 +193,4 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 
 	h.registry.Writer().Write(w, r, grants)
-}
-
-// swagger:route POST /grants/jwt-bearer/flush admin flushInactiveJWTBearerGrants
-//
-// Flush Expired jwt-bearer grants.
-//
-// This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be
-// not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
-// automatically when performing the refresh flow.
-//
-//     Consumes:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       500: genericError
-func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var request flushInactiveGrantsRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		h.registry.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if request.NotAfter.IsZero() {
-		request.NotAfter = time.Now().UTC()
-	}
-
-	if err := h.registry.GrantManager().FlushInactiveGrants(r.Context(), request.NotAfter); err != nil {
-		h.registry.Writer().WriteError(w, r, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
 }

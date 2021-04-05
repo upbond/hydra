@@ -41,8 +41,9 @@ func (o *GetLogoutRequestReader) ReadResponse(response runtime.ClientResponse, c
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -51,7 +52,7 @@ func NewGetLogoutRequestOK() *GetLogoutRequestOK {
 	return &GetLogoutRequestOK{}
 }
 
-/* GetLogoutRequestOK describes a response with status code 200, with default header values.
+/*GetLogoutRequestOK handles this case with default header values.
 
 logoutRequest
 */
@@ -62,6 +63,7 @@ type GetLogoutRequestOK struct {
 func (o *GetLogoutRequestOK) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestOK  %+v", 200, o.Payload)
 }
+
 func (o *GetLogoutRequestOK) GetPayload() *models.LogoutRequest {
 	return o.Payload
 }
@@ -83,7 +85,7 @@ func NewGetLogoutRequestNotFound() *GetLogoutRequestNotFound {
 	return &GetLogoutRequestNotFound{}
 }
 
-/* GetLogoutRequestNotFound describes a response with status code 404, with default header values.
+/*GetLogoutRequestNotFound handles this case with default header values.
 
 genericError
 */
@@ -94,6 +96,7 @@ type GetLogoutRequestNotFound struct {
 func (o *GetLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestNotFound  %+v", 404, o.Payload)
 }
+
 func (o *GetLogoutRequestNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -115,7 +118,7 @@ func NewGetLogoutRequestInternalServerError() *GetLogoutRequestInternalServerErr
 	return &GetLogoutRequestInternalServerError{}
 }
 
-/* GetLogoutRequestInternalServerError describes a response with status code 500, with default header values.
+/*GetLogoutRequestInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -126,6 +129,7 @@ type GetLogoutRequestInternalServerError struct {
 func (o *GetLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *GetLogoutRequestInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

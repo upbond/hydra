@@ -131,7 +131,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 				ctx := context.Background()
 				jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
 
-				notAfter := time.Now().Round(time.Second).Add(-v)
+				notAfter := time.Now().UTC().Round(time.Second).Add(-v)
 
 				t.Run("step=setup-access-token", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
 				t.Run("step=setup-refresh-token", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))

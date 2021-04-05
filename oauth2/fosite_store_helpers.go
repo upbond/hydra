@@ -184,7 +184,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testFositeStoreClientAssertionJWTValid/db=%s", k), testFositeStoreClientAssertionJWTValid(store))
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
 	t.Run(fmt.Sprintf("case=testHelperRevokeAccessToken/db=%s", k), testHelperRevokeAccessToken(store))
-	t.Run(fmt.Sprintf("case=testFositeJWTBearerGrantStorage/db=%s", k), testFositeJWTBearerGrantStorage(store))
+	t.Run(fmt.Sprintf("case=testFositegrantTypeJwtBearerStorage/db=%s", k), testFositegrantTypeJwtBearerStorage(store))
 }
 
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
@@ -697,7 +697,7 @@ func testFositeStoreClientAssertionJWTValid(m InternalRegistry) func(*testing.T)
 	}
 }
 
-func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
+func testFositegrantTypeJwtBearerStorage(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		grantManager := x.GrantManager()
 		keyManager := x.KeyManager()

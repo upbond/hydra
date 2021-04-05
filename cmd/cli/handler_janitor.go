@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ory/hydra/persistence"
-
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/flagx"
@@ -24,8 +22,9 @@ const (
 	AccessLifespan         = "access-lifespan"
 	RefreshLifespan        = "refresh-lifespan"
 	ConsentRequestLifespan = "consent-request-lifespan"
-	OnlyTokens             = "tokens"
-	OnlyRequests           = "requests"
+	Tokens                 = "tokens"
+	Requests               = "requests"
+	GrantTypeJWTBearer     = "grant-type-jwt-bearer"
 	ReadFromEnv            = "read-from-env"
 	Config                 = "config"
 )
@@ -48,9 +47,8 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 			"- Using the config file with flag -c, --config")
 	}
 
-	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) {
-		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
-			"Janitor requires either --tokens or --requests or both to be set")
+	if !flagx.MustGetBool(cmd, Tokens) && !flagx.MustGetBool(cmd, Requests) && !flagx.MustGetBool(cmd, GrantTypeJWTBearer) {
+		return fmt.Errorf("%s\nJanitor requires at least --%s or --%s or --%s to be set\n", cmd.UsageString(), Tokens, Requests, GrantTypeJWTBearer)
 	}
 
 	return nil
@@ -80,8 +78,7 @@ func purge(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	notAfter := time.Now()
-
+	notAfter := time.Now().UTC()
 	if keepYounger := flagx.MustGetDuration(cmd, KeepIfYounger); keepYounger > 0 {
 		notAfter = notAfter.Add(-keepYounger)
 	}
@@ -111,31 +108,21 @@ func purge(cmd *cobra.Command, args []string) error {
 
 	p := d.Persister()
 
-	var routineFlags []string
-
-	if flagx.MustGetBool(cmd, OnlyTokens) {
-		routineFlags = append(routineFlags, OnlyTokens)
-	}
-
-	if flagx.MustGetBool(cmd, OnlyRequests) {
-		routineFlags = append(routineFlags, OnlyRequests)
-	}
-
-	return cleanupRun(cmd.Context(), notAfter, addRoutine(p, routineFlags...)...)
-}
-
-func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
 	var routines []cleanupRoutine
-	for _, n := range names {
-		switch n {
-		case OnlyTokens:
-			routines = append(routines, cleanup(p.FlushInactiveAccessTokens, "access tokens"))
-			routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
-		case OnlyRequests:
-			routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
-		}
+	if flagx.MustGetBool(cmd, Tokens) {
+		routines = append(routines, cleanup(p.FlushInactiveAccessTokens, "access tokens"))
+		routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
 	}
-	return routines
+
+	if flagx.MustGetBool(cmd, Requests) {
+		routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
+	}
+
+	if flagx.MustGetBool(cmd, GrantTypeJWTBearer) {
+		routines = append(routines, cleanup(p.FlushInactiveGrants, "grant types jwt bearer"))
+	}
+
+	return cleanupRun(cmd.Context(), notAfter, routines...)
 }
 
 type cleanupRoutine func(ctx context.Context, notAfter time.Time) error

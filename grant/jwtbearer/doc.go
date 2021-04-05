@@ -30,8 +30,8 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-// swagger:model createJWTBearerGrantParams
-type swaggerCreateJWTBearerGrantParams struct {
+// swagger:model createGrantTypeJwtBearerParams
+type swaggerCreateGrantTypeJwtBearerParams struct {
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
 	// required:true
 	// example: https://jwt-idp.example.com
@@ -56,37 +56,49 @@ type swaggerCreateJWTBearerGrantParams struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-// swagger:parameters createJWTBearerGrant
-type swaggerCreateJWTBearerGrantRequestParams struct {
+// swagger:parameters createGrantTypeJwtBearer
+type swaggerCreateGrantTypeJwtBearerRequestParams struct {
+	// Request Body
+	//
 	// in: body
-	Body swaggerCreateJWTBearerGrantParams
+	Body swaggerCreateGrantTypeJwtBearerParams
 }
 
-// swagger:parameters getJWTBearerGrantList
-type swaggerGetJWTBearerGrantListParams struct {
+// List of Grant Types for JWT Bearer Profile
+//
+// swagger:parameters getGrantTypeJwtBearerList
+type swaggerGetGrantTypeJwtBearerListParams struct {
 	// If Optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
+	//
 	// in: query
 	// required: false
 	Issuer string `json:"issuer"`
 }
 
-// swagger:parameters getJWTBearerGrant deleteJWTBearerGrant updateJWTBearerGrant
-type swaggerJWTBearerGrantQuery struct {
+// swagger:parameters getGrantTypeJwtBearer deleteGrantTypeJwtBearer updateGrantTypeJwtBearer
+type swaggerGrantTypeJwtBearerQuery struct {
 	// The id of the desired grant
+	//
 	// in: path
 	// required: true
 	ID string `json:"id"`
 }
 
-// swagger:response JWTBearerGrantList
-type swaggerJWTBearerGrantList struct {
+// List of Grant Types for JWT Bearer Profile
+//
+// swagger:response grantTypeJwtBearerList
+type swaggerGrantTypeJwtBearerList struct {
+	// Request Body
+	//
 	// in: body
 	// type: array
-	Body []swaggerJWTBearerGrant
+	Body []swaggerGrantTypeJwtBearer
 }
 
-// swagger:model JWTBearerGrant
-type swaggerJWTBearerGrant struct {
+// Grant Type for JWT Bearer Profile
+//
+// swagger:model grantTypeJwtBearer
+type swaggerGrantTypeJwtBearer struct {
 	// example: 9edc811f-4e28-453c-9b46-4de65f00217f
 	ID string `json:"id"`
 
@@ -103,7 +115,7 @@ type swaggerJWTBearerGrant struct {
 	Scope []string `json:"scope"`
 
 	// The "public_key" contains information about public key issued by "issuer", that will be used to check JWT assertion signature.
-	PublicKey swaggerJWTBearerGrantPublicKey `json:"public_key"`
+	PublicKey swaggerGrantTypeJwtBearerPublicKey `json:"public_key"`
 
 	// The "created_at" indicates, when grant was created.
 	CreatedAt time.Time `json:"created_at"`
@@ -112,8 +124,8 @@ type swaggerJWTBearerGrant struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-// swagger:model JWTBearerGrantPublicKey
-type swaggerJWTBearerGrantPublicKey struct {
+// swagger:model grantTypeJwtBearerPublicKey
+type swaggerGrantTypeJwtBearerPublicKey struct {
 	// The "set" is basically a name for a group(set) of keys. Will be the same as "issuer" in grant.
 	// example: https://jwt-idp.example.com
 	Set string `json:"set"`
@@ -121,17 +133,4 @@ type swaggerJWTBearerGrantPublicKey struct {
 	// The "key_id" is key unique identifier (same as kid header in jws/jwt).
 	// example: 123e4567-e89b-12d3-a456-426655440000
 	KeyID string `json:"kid"`
-}
-
-// swagger:parameters flushInactiveJWTBearerGrants
-type swaggerFlushInactiveJWTBearerGrantsRequestParams struct {
-	// in: body
-	Body swaggerFlushInactiveJWTBearerGrantsParams
-}
-
-// swagger:model flushInactiveJWTBearerGrantsParams
-type swaggerFlushInactiveJWTBearerGrantsParams struct {
-	// The "notAfter" sets after which point grants should not be flushed. This is useful when you want to keep a history
-	// of recently added grants.
-	NotAfter time.Time `json:"notAfter"`
 }

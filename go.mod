@@ -47,6 +47,7 @@ require (
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.3
+	github.com/ory/kratos v0.5.5-alpha.1.0.20210319103511-3726ed4d145a
 	github.com/ory/x v0.0.212
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2

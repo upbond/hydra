@@ -54,4 +54,5 @@ type FositeStorer interface {
 	DeleteAccessTokens(ctx context.Context, clientID string) error
 
 	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error
+	FlushInactiveGrants(ctx context.Context, notAfter time.Time) error
 }
