@@ -8,6 +8,10 @@ replace github.com/ory/kratos/corp => github.com/ory/kratos/corp v0.0.0-20210118
 
 replace github.com/ory/kratos-client-go => github.com/ory/kratos-client-go v0.5.4-alpha.1.0.20210210170256-960b093d8bf9
 
+replace github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
+
+replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
+
 require (
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -43,7 +47,7 @@ require (
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.3
-	github.com/ory/x v0.0.209
+	github.com/ory/x v0.0.212
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
@@ -56,7 +60,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
-	github.com/tidwall/gjson v1.6.7
+	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0
