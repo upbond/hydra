@@ -609,3 +609,8 @@ The following projects are outdated and won't work anymore in most cases. Having
 * [Creating an oauth2 custom lamda authorizer for use with Amazons (AWS) API Gateway using Hydra](https://blogs.edwardwilde.com/2017/01/12/creating-an-oauth2-custom-lamda-authorizer-for-use-with-amazons-aws-api-gateway-using-hydra/)
 * Warning, ORY Hydra has changed almost everything since writing this
 article: [Hydra: Run your own Identity and Access Management service in <5 Minutes](https://blog.gopheracademy.com/advent-2015/hydra-auth/)
+
+
+#### Build Image For Environments
+ 1. make deploy/hydra.{env}.yml
+ 2. add .github/workflows/deploy-{env}.yml
