@@ -14,7 +14,7 @@ RUN go mod download
 
 ADD . .
 
-RUN go build -tags sqlite -o /usr/bin/hydra
+RUN go build -o /usr/bin/hydra
 
 FROM alpine:3.13.4
 
@@ -24,13 +24,7 @@ RUN addgroup -S ory; \
 
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra
 
-# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
-# is required for read/write of SQLite.
-RUN mkdir -p /var/lib/sqlite
-RUN chown ory:ory /var/lib/sqlite
-VOLUME /var/lib/sqlite
-
-ARG profile="local"
+ARG profile="dev"
 
 # Exposing the ory home directory to simplify passing in hydra configuration (e.g. if the file $HOME/.hydra.yaml
 # exists, it will be automatically used as the configuration file).

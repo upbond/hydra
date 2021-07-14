@@ -685,8 +685,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-# dsn: "mysql://admin:Wdxewsm37GBpAHg1MGGC@tcp(upbond-ciam-poc.cy5wxwv196bs.ap-northeast-1.rds.amazonaws.com:3306)/hydra?max_conns=20&max_idle_conns=4"
-dsn: "mysql://root@tcp(docker.for.mac.localhost:3306)/hydra?parseTime=true"
+# dsn: "mysql://root@tcp(docker.for.mac.localhost:3306)/hydra?parseTime=true"
 
 ## webfinger ##
 #
