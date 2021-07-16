@@ -710,7 +710,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_OIDC_DISCOVERY_TOKEN_URL=<value>
     #
-    token_url: https://hydra.upbond.io/oauth2/token
+    token_url: https://hydra.poc.upbond.io/oauth2/token
 
     ## auth_url ##
     #
@@ -725,7 +725,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_OIDC_DISCOVERY_AUTH_URL=<value>
     #
-    auth_url: https://hydra.upbond.io/oauth2/auth
+    auth_url: https://hydra.poc.upbond.io/oauth2/auth
 
     ## client_registration_url ##
     #
@@ -740,7 +740,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_OIDC_DISCOVERY_CLIENT_REGISTRATION_URL=<value>
     #
-    client_registration_url: https://hydra.upbond.io/clients
+    client_registration_url: https://hydra.poc.upbond.io/clients
 
     ## supported_claims ##
     #
@@ -808,7 +808,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
     #
-    jwks_url: https://hydra.upbond.io/.well-known/jwks.json
+    jwks_url: https://hydra.poc.upbond.io/.well-known/jwks.json
 
   ## jwks ##
   #
@@ -920,7 +920,7 @@ urls:
   #    > set URLS_LOGIN=<value>
   #
   # login: https://kratos-ui.upbond.io/login
-  login: https://kratos-ui.upbond.io/auth/hydra/login
+  login: https://browser.poc.upbond.io/auth/hydra/login
 
   ## consent ##
   #
@@ -936,7 +936,7 @@ urls:
   #    > set URLS_CONSENT=<value>
   #
   # consent: https://kratos-ui.upbond.io/consent
-  consent: https://kratos-ui.upbond.io/auth/hydra/consent
+  consent: https://browser.poc.upbond.io/auth/hydra/consent
 
   ## logout ##
   #
@@ -951,7 +951,7 @@ urls:
   # - Windows Command Line (CMD):
   #    > set URLS_LOGOUT=<value>
   #
-  logout: https://kratos-ui.upbond.io/logout
+  logout: https://browser.poc.upbond.io/logout
 
   ## error ##
   #
@@ -966,7 +966,7 @@ urls:
   # - Windows Command Line (CMD):
   #    > set URLS_ERROR=<value>
   #
-  error: https://kratos-ui.upbond.io/error
+  error: https://browser.poc.upbond.io/error
 
   ## post_logout_redirect ##
   #
@@ -981,7 +981,7 @@ urls:
   # - Windows Command Line (CMD):
   #    > set URLS_POST_LOGOUT_REDIRECT=<value>
   #
-  post_logout_redirect: https://kratos-ui.upbond.io/logout-successful
+  post_logout_redirect: https://browser.poc.upbond.io/logout-successful
 
   ## self ##
   #
@@ -999,7 +999,7 @@ urls:
     # - Windows Command Line (CMD):
     #    > set URLS_SELF_PUBLIC=<value>
     #
-    public: https://hydra.upbond.io/
+    public: https://hydra.poc.upbond.io/
 
     ## issuer ##
     #
@@ -1014,7 +1014,7 @@ urls:
     # - Windows Command Line (CMD):
     #    > set URLS_SELF_ISSUER=<value>
     #
-    issuer: https://hydra.upbond.io/
+    issuer: https://hydra.poc.upbond.io/
 
 ## strategies ##
 #
